@@ -55,41 +55,58 @@ namespace DataExportCustomNode
                     {
                         ExportValue exportValue = new ExportValue();
                         exportValue.ColumnName = ColumnName[i];
-                        try //Try to use a property 
+                        switch (Fields[i])
                         {
-                            exportValue.Value = Process.Properties.GetPropertyByName(Fields[i]).Value;
-                            exportValue.Type = Process.Properties.GetPropertyByName(Fields[i]).Type;
-                        }
-                        catch (Exception) //If no property exists, use the document field
-                        {
-                            bool fieldDoesNotExistFlag = true;
-                            foreach (var field in GSDocument.Fields)
-                            {
-                                if (field.Name == Fields[i])
+                            case "DocID":
+                                exportValue.Value = Process.Document.DocumentId.ToString();
+                                exportValue.Type = 1;
+                                break;
+                            case "ArchiveID":
+                                exportValue.Value = Process.Document.ArchiveId.ToString();
+                                exportValue.Type = 1;
+                                break;
+                            case "IID":
+                                exportValue.Value = Guid.NewGuid().ToString();
+                                exportValue.Type = 1;
+                                break;
+                            default:
+                                try //Try to use a property 
                                 {
-                                    foreach (var docField in Document.Fields)
+                                    exportValue.Value = Process.Properties.GetPropertyByName(Fields[i]).Value;
+                                    exportValue.Type = Process.Properties.GetPropertyByName(Fields[i]).Type;
+                                }
+                                catch (Exception) //If no property exists, use the document field
+                                {
+                                    bool fieldDoesNotExistFlag = true;
+                                    foreach (var field in GSDocument.Fields)
                                     {
-                                        if (docField.Id == field.Id)
+                                        if (field.Name == Fields[i])
                                         {
-                                            exportValue.Value = docField.Mval.Count() > 0 ? docField.Mval[0] : docField.Val;
-                                            exportValue.Type = field.Type;
-                                            fieldDoesNotExistFlag = false;
+                                            foreach (var docField in Document.Fields)
+                                            {
+                                                if (docField.Id == field.Id)
+                                                {
+                                                    exportValue.Value = docField.Mval.Count() > 0 ? docField.Mval[0] : docField.Val;
+                                                    exportValue.Type = field.Type;
+                                                    fieldDoesNotExistFlag = false;
+                                                    break;
+                                                }
+                                            }
                                             break;
                                         }
                                     }
-                                    break;
+                                    if (fieldDoesNotExistFlag)
+                                    {
+                                        throw new Exception($"Document Field Does Not Exist: {Fields[i]}");
+                                    }
                                 }
-                            }
-                            if (fieldDoesNotExistFlag)
-                            {
-                                throw new Exception($"Document Field Does Not Exist: {Fields[i]}");
-                            }
-                        }
 
-                        if (FieldOptions[i] != "") //Apply formatting if it exists
-                        {
-                            FieldOptions Options = JsonConvert.DeserializeObject<FieldOptions>(FieldOptions[i]);
-                            exportValue = ApplyFormatting(exportValue, Options);
+                                if (ValidateJSON(FieldOptions[i])) //Apply formatting if it exists
+                                {
+                                    FieldOptions Options = JsonConvert.DeserializeObject<FieldOptions>(FieldOptions[i]);
+                                    exportValue = ApplyFormatting(exportValue, Options);
+                                }
+                                break;
                         }
 
                         exportRow.Values.Add(exportValue);
@@ -258,6 +275,18 @@ namespace DataExportCustomNode
                 exportValue.Type = 1; //Set the type to String after formatting is applied
             }
             return formattedValue;
+        }
+        internal bool ValidateJSON(string json)
+        {
+            try
+            {
+                JsonConvert.DeserializeObject(json);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
         internal class ExportRow
         {

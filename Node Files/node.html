@@ -126,7 +126,15 @@
 								<tbody id="mappingBody">
 									<tr repeat-list>
 										<td><div id="handle" class="icon-wrapper"><i class="fas fa-grip-lines" style="font-size: 20px;"></i></div><input style="display: none;" id="options" type="text" class="form-control" setting="Options" setting-type="list" setting-hidden></td>
-										<td style="width: 50%;"><select id="fieldSelect" class="form-control" setting="Fields" setting-type="list" setting-hidden workflow-properties workflow-fields><option value=""></option></select></td>
+										<td style="width: 50%;">
+											<select id="fieldSelect" class="form-control" setting="Fields" setting-type="list" setting-hidden workflow-properties workflow-fields>
+												<option value=""></option>
+												<option value="DocID">DocID</option>
+												<option value="ArchiveID">ArchiveID</option>
+												<option value="IID">UniqueID</option>
+												<option disabled>──────────</option>
+											</select>
+										</td>
 										<td style="width: 50%;"><input id="columnName" type="text" class="form-control" setting="ColumnName" setting-type="list" setting-hidden></td>
 										<td>
 											<div class="icon-wrapper">

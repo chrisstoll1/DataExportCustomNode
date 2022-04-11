@@ -57,7 +57,8 @@ $("body").on("click", "#removeRow", function () {
 
 //Set Column Name default value
 $("body").on("change", "#fieldSelect", function () {
-    $(this).closest("tr").find("input").val(this.value);
+    $(this).closest("tr").find("input").val(this[this.selectedIndex].label);
+    console.log(this);
 });
 
 //Refresh labels on export type change
@@ -89,7 +90,8 @@ $("body").on("click", "#optionDropDown", function () {
         $(this).closest("div").find("ul").children().last().attr('class', '');
         $(this).closest("div").find("ul").children().last().find("a").attr('id', 'removeRow');
     }
-    if ($(this).closest("tr").find("#fieldSelect").val() == '') {
+    var fieldSelectValue = $(this).closest("tr").find("#fieldSelect").val();
+    if (fieldSelectValue == '' || fieldSelectValue == 'DocID' || fieldSelectValue == 'ArchiveID' || fieldSelectValue == 'IID') {
         $(this).closest("div").find("ul").children().first().attr('class', 'disabled');
         $(this).closest("div").find("ul").children().first().find("a").attr('id', '');
         $(this).closest("div").find("ul").children().first().find("a").attr('data-target', '');
