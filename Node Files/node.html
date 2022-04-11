@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="jquery-3.4.1.min.js"></script>
+		<script src="jqueryui-1.11.4.js"></script>
+		<link rel="stylesheet" href="bootstrap-3.4.1.min.css">
+		<script src="bootstrap-3.4.1.min.js"></script>
+		<script defer src="fontawesome-all-5.13.0.min.js"></script>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body node-height="550">
+
+		<div class="modal-body">
+
+			<div class="row">
+				<div class="col-md-12 form-group required">
+					<label class="control-label">Export Type</label><req> *</req>
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="exportTypeRadio" id="csvRadio" value="CSV" setting="ExportType" setting-type="string">
+						<label class="form-check-label" for="csvRadio">
+							CSV
+						</label>
+					</div>
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="exportTypeRadio" id="sqlRadio" value="SQL" setting="ExportType" setting-type="string">
+						<label class="form-check-label" for="sqlRadio">
+							SQL
+						</label>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-12 form-group required">
+					<label id="exportPathLabel" class="control-label"></label><req> *</req>
+					<input id="exportPath" type="text" class="form-control" setting="ExportPath" setting-type="string" setting-hidden required>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12 form-group tablename-wrapper">
+					<label class="control-label">Table Name</label>
+					<input id="tableName" type="text" class="form-control" setting="TableName" setting-type="string" setting-hidden>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12 form-group delimiter-wrapper">
+					<label class="control-label">Delimiter</label>
+					<input id="delimiter" type="text" class="form-control" value="," setting="Delimiter" setting-type="string" setting-hidden>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12 form-group checkbox-wrapper">
+					<div class="checkbox-inline">
+						<input class="form-check-input" type="checkbox" id="includeColumnHeaders" setting="IncludeColumnHeaders" setting-type="boolean" setting-hidden>
+						<label class="form-check-label" for="includeColumnHeaders">Include Column Headers</label>
+					</div>
+					<div class="checkbox-inline">
+						<input class="form-check-input" type="checkbox" id="appendToExisting" setting="AppendToExisting" setting-type="boolean" setting-hidden>
+						<label class="form-check-label" for="appendToExisting">Append To Existing</label>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Field Options modal -->
+			<div class="modal fade" id="fieldOptions" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="modalLabel">Field Name - Options</h4>
+						</div>
+						<div class="modal-body">
+							<label class="control-label">Format</label>
+							<input type="text" id="format" class="form-control" placeholder="mm/dd/yyyy">
+							<label class="control-label" style="padding-top: 10px;">Replacement</label>
+							<div class="panel panel-default">
+								<div id="headers" class="tab-pane fade in active">
+									<table class="table">
+										<thead>
+											<tr>
+												<th></th>
+												<th style="width: 50%;">Pattern Match</th>
+												<th style="width: 50%;">Replacement</th>
+												<th style="padding-left: 5px;"><a class="replacementAddRow"><i class="fas fa-plus-square" style="font-size: 20px;"></i></a></th>
+											</tr>
+										</thead>
+										<tbody id="replacementBody">
+											<tr replacement-repeat-list>
+												<td><div id="replacementHandle" class="icon-wrapper"><i class="fas fa-grip-lines" style="font-size: 20px;"></i></div></td>
+												<td style="width: 50%;"><input id="patternMatch" type="text" class="form-control"></td>
+												<td style="width: 50%;"><input id="replacement" type="text" class="form-control"></td>
+												<td style="padding-left: 6px;">
+													<a id="replacementRemoveRow">
+														<i class="fa fa-times"  style="font-size: 20px;"></i>
+													</a>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<label class="control-label">Field Mapping</label>
+					<div class="panel panel-default">
+						<div id="headers" class="tab-pane fade in active">
+							<table id="mappingTable" class="table">
+								<thead>
+									<tr>
+										<th></th>
+										<th style="width: 50%;">Field</th>
+										<th style="width: 50%;">Column Name</th>
+										<th><a class="addRow"><i class="fas fa-plus-square" style="font-size: 20px;"></i></a></th>
+									</tr>
+								</thead>
+								<tbody id="mappingBody">
+									<tr repeat-list>
+										<td><div id="handle" class="icon-wrapper"><i class="fas fa-grip-lines" style="font-size: 20px;"></i></div><input style="display: none;" id="options" type="text" class="form-control" setting="Options" setting-type="list" setting-hidden></td>
+										<td style="width: 50%;"><select id="fieldSelect" class="form-control" setting="Fields" setting-type="list" setting-hidden workflow-properties workflow-fields><option value=""></option></select></td>
+										<td style="width: 50%;"><input id="columnName" type="text" class="form-control" setting="ColumnName" setting-type="list" setting-hidden></td>
+										<td>
+											<div class="icon-wrapper">
+												<div class="btn-group">
+													<a id="optionDropDown" class="optionRow  dropdown-toggle" data-toggle="dropdown">
+														<i class="fa fa-ellipsis-v"  style="font-size: 20px;"></i>
+													</a>
+													<ul class="dropdown-menu dropdown-menu-right">
+													  <li><a id="openRowOptions" data-toggle="modal" data-target="#fieldOptions"><b>Options</b></a></li>
+													  <li role="separator" class="divider"></li>
+													  <li><a id="removeRow"><b>Delete</b></a></li>
+													</ul>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+		<script src="script.js"></script>
+
+	</body>
+	
+</html>

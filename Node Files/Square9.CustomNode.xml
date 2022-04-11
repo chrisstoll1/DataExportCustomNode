@@ -1,0 +1,982 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Square9.CustomNode</name>
+    </assembly>
+    <members>
+        <member name="T:Square9.CustomNode.ActionDocument">
+            <summary>
+            Represents the document of an ActionProcess, containing properties with GlobalAction document information.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionDocument.DocumentId">
+            <summary>
+            Gets the document ID associated with a GlobalAction process.
+            </summary>
+            <returns>Document ID.</returns>
+        </member>
+        <member name="P:Square9.CustomNode.ActionDocument.ArchiveId">
+            <summary>
+            Gets the document Archive ID associated with a GlobalAction process.
+            </summary>
+            <returns>Document Archive ID.</returns>
+        </member>
+        <member name="P:Square9.CustomNode.ActionDocument.DatabaseId">
+            <summary>
+            Gets the document Database ID associated with a GlobalAction process.
+            </summary>
+            <returns>Document Database ID.</returns>
+        </member>
+        <member name="T:Square9.CustomNode.CaptureDocument">
+            <summary>
+            Represents the document of a GlobalCapture process, containing methods and properties for interaction with a GlobalCapture document.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureDocument.PageCount">
+            <summary>
+            Number of pages on the process.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.GetPage(System.Int32)">
+            <summary>
+            Gets a page file path from the process at a specified index.
+            </summary>
+            <param name="index">The zero based index of the page.</param>
+            <returns>The file path of the page.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.GetPages">
+            <summary>
+            Gets the full list of page file paths from the process.
+            </summary>
+            <returns>List of page file paths.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.AddPage(System.String)">
+            <summary>
+            Adds a file page to the process.
+            </summary>
+            <param name="path">Path pointing to the page to add to the process.</param>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.InsertPage(System.String,System.Int32)">
+            <summary>
+            Inserts a file page to the process at a specific index.
+            </summary>
+            <param name="path">Path pointing to the page to insert into the process.</param>
+            <param name="index">The zero-based index at which the page should be inserted.</param>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.MergePages">
+            <summary>
+            Merges a separated document into a single file on the process.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.MovePage(System.Int32,System.Int32)">
+            <summary>
+            Moves a page from one index in the page array to another.
+            </summary>
+            <param name="index">Index of the page to move.</param>
+            <param name="newIndex">Destination index of the moving page.</param>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.RemovePage(System.Int32)">
+            <summary>
+            Removes a page from the process at a specified index and deletes it from the file system.
+            </summary>
+            <param name="index">The zero-based index of the page to remove.</param>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.ReplacePage(System.Int32,System.String)">
+            <summary>
+            Replaces a page at a specific index on the process with another page.
+            </summary>
+            <param name="index">The zero-based index at which the page should be replaced.</param>
+            <param name="path">Path pointing to the page to add to the process.</param>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureDocument.ClearPages">
+            <summary>
+            Clears all pages from the process.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.ActionNode">
+            <summary>
+            Base class from which GlobalAction Nodes derive and define behavior.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionNode.Process">
+            <summary>
+            A class of helper methods pertaining to the current process.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionNode.Engine">
+            <summary>
+            A class of helper methods pertaining to the executing engine.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.ActionNode.Prepare(Square9.CustomNode.Helpers.NodeHelper,Square9.CustomNode.Helpers.ProcessHelper,System.Collections.Generic.Dictionary{System.String,Square9.CustomNode.Setting})">
+            <summary>
+            A method that the engine runs to prepare the custom node for execution. 
+            Do not call this method from your <see cref="T:Square9.CustomNode.CustomNode"/> code.
+            </summary>
+            <param name="nodeHelper">Node helper provided by engine.</param>
+            <param name="processHelper">Process helper provided by engine.</param>
+            <param name="nodeSettings">Node settings.</param>
+        </member>
+        <member name="T:Square9.CustomNode.CaptureNode">
+            <summary>
+            Base class from which GlobalCapture Nodes derive and define behavior.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureNode.Process">
+            <summary>
+            A class of helper methods pertaining to the current process.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureNode.Engine">
+            <summary>
+            A class of helper methods pertaining to the executing engine.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureNode.CreateProcess(System.String)">
+            <summary>
+            Creates a new <see cref="T:Square9.CustomNode.CaptureProcess"/> based on the executing workflow, at the default initiator.
+            Throws an <see cref="T:System.InvalidOperationException"></see> if the executing workflow has more than one initiator node.
+            This <see cref="T:Square9.CustomNode.CaptureProcess"/> can be inserted into the database by calling the <see cref="M:Square9.CustomNode.Database.InsertProcess(Square9.CustomNode.Process)"/> method.
+            </summary>
+            <param name="path">File to spawn the new process from.</param>
+            <returns>A new <see cref="T:Square9.CustomNode.CaptureProcess"/> held in memory.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureNode.CreateProcess(System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:Square9.CustomNode.CaptureProcess"/> based on the executing workflow.
+            This <see cref="T:Square9.CustomNode.CaptureProcess"/> can be inserted into the database by calling the <see cref="M:Square9.CustomNode.Database.InsertProcess(Square9.CustomNode.Process)"/> method.
+            </summary>
+            <param name="path">File to spawn the new process from.</param>
+            <param name="startNode">Name of the node at which to begin the process.</param>
+            <returns>A new <see cref="T:Square9.CustomNode.CaptureProcess"/> held in memory.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureNode.Prepare(Square9.CustomNode.Helpers.NodeHelper,Square9.CustomNode.Helpers.ProcessHelper,System.Collections.Generic.Dictionary{System.String,Square9.CustomNode.Setting})">
+            <summary>
+            A method that the engine runs to prepare the custom node for execution. 
+            Do not call this method from your <see cref="T:Square9.CustomNode.CustomNode"/> code.
+            </summary>
+            <param name="nodeHelper">Node helper provided by engine.</param>
+            <param name="processHelper">Process helper provided by engine.</param>
+            <param name="nodeSettings">Node settings.</param>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureNode.Helper">
+            <summary>
+            Helper class provided by the engine at runtime. 
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.ActionEngine">
+            <summary>
+            Represents the executing GlobalAction engine, containing methods and properties pertaining to engine information.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.ActionEngine.GetSquare9ApiClient">
+            <summary>
+            Gets an <see cref="T:System.Net.Http.HttpClient"/> object configured to make calls to the Square9 API associated with the executing GlobalAction workflow.
+            </summary>
+            <returns><see cref="T:System.Net.Http.HttpClient"/> associated with the executing engine.</returns>
+        </member>
+        <member name="T:Square9.CustomNode.ActionProcess">
+            <summary>
+            Represents a GlobalAction process in memory, containing properties, methods and classes for use in process manipulation.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionProcess.Document">
+            <summary>
+            A class of helper methods pertaining to the GlobalAction document and page information on the process.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.CaptureEngine">
+            <summary>
+            Represents the executing GlobalCapture engine, containing methods and properties pertaining to engine information.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.CaptureProcess">
+            <summary>
+            Represents a GlobalCapture process in memory, containing properties, methods and classes for use in process manipulation.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureProcess.Document">
+            <summary>
+            A class of helper methods pertaining to the GlobalCapture document and page information on the process.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.ActionImporter">
+            <summary>
+            Parent class for custom GlobalAction import nodes.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.ActionImporter.Import">
+            <summary>
+            The method that will run when a <see cref="T:Square9.CustomNode.ActionImporter"/> is picked up by the engine.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionImporter.Engine">
+            <summary>
+            A class of helper methods pertaining to the executing engine.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionImporter.Settings">
+            <summary>
+            A class of helper methods for interacting with the <see cref="T:Square9.CustomNode.Setting"/>s controlled by the interface of the <see cref="T:Square9.CustomNode.CustomNode"/>.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionImporter.Database">
+            <summary>
+            A class of helper methods involving the creation, deletion, and updating of processes in the MongoDB database.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionImporter.DatabaseId">
+            <summary>
+            Database ID associated with this GlobalAction workflow.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionImporter.NodeDirectory">
+            <summary>
+            Path to the directory containing files extracted from the custom node.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.ActionImporter.Workflow">
+            <summary>
+            Dynamic object containing the executing workflow. 
+            Changes made to this object will not be saved. 
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.ActionImporter.LoadConfig``1">
+            <summary>
+            Returns a strongly typed object deserialized from the JSON data in the node.config file included in the custom node .s9n file.
+            </summary>
+            <typeparam name="T">Type of config object.</typeparam>
+            <returns>An object deserialized from the JSON in node.config.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.ActionImporter.Prepare(Square9.CustomNode.Helpers.BaseHelper,System.Collections.Generic.Dictionary{System.String,Square9.CustomNode.Setting})">
+            <summary>
+            A method that the engine runs to prepare the custom node for execution. 
+            Do not call this method from your <see cref="T:Square9.CustomNode.ActionImporter"/> code.
+            </summary>
+            <param name="baseHelper">Helper class supplied by the engine at runtime.</param>
+            <param name="nodeSettings">Dictionary of node settings.</param>
+        </member>
+        <member name="P:Square9.CustomNode.ActionImporter.Helper">
+            <summary>
+            Helper class provided by the engine at runtime. 
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.GlobalSearchDocument">
+            <summary>
+            Represents a GlobalSearch document associated with a GlobalAction custom node.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.GlobalSearchDocument.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the GlobalSearchDocument class with a specified Archive ID and Document ID.
+            </summary>
+            <param name="archiveId">Archive Id of the GlobalSearch document.</param>
+            <param name="documentId">DocumentId of the GlobalSearch document.</param>
+        </member>
+        <member name="P:Square9.CustomNode.GlobalSearchDocument.ArchiveId">
+            <summary>
+            Archive Id of the document.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.GlobalSearchDocument.DocumentId">
+            <summary>
+            Id of the document.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.CustomNode">
+            <summary>
+            Base class from which Custom Nodes derive and define behavior.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.CustomNode.Run">
+            <summary>
+            The method that will run when a <see cref="T:Square9.CustomNode.CustomNode"/> is called by the engine.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CustomNode.Process">
+            <summary>
+            A class of helper methods pertaining to the current process.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CustomNode.Engine">
+            <summary>
+            A class of helper methods pertaining to the executing engine.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CustomNode.Settings">
+            <summary>
+            A class of helper methods for interacting with the <see cref="T:Square9.CustomNode.Setting"/>s controlled by the interface of the <see cref="T:Square9.CustomNode.CustomNode"/>.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CustomNode.Database">
+            <summary>
+            A class of helper methods involving the creation, deletion, and updating of processes in the MongoDB database.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CustomNode.Links">
+            <summary>
+            List of available node links. You can move along these links by calling the <see cref="M:Square9.CustomNode.CustomNode.SetNextNodeByLinkName(System.String)"/> method.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CustomNode.NodeDirectory">
+            <summary>
+            Path to the directory containing files extracted from the custom node.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CustomNode.Workflow">
+            <summary>
+            Dynamic object containing the executing workflow. 
+            Changes made to this object will not be saved. 
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.CustomNode.CreateProcessByWorkflowName(System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:Square9.CustomNode.CaptureProcess"/> based on a workflow by name, at the default initiator.
+            Throws an <see cref="T:System.InvalidOperationException"></see> if the executing workflow has more than one initiator node.
+            This <see cref="T:Square9.CustomNode.CaptureProcess"/> can be inserted into the database by calling the <see cref="M:Square9.CustomNode.Database.InsertProcess(Square9.CustomNode.Process)"/> method.
+            </summary>
+            <param name="path">File to spawn the new process from.</param>
+            <param name="workflowName">Name of workflow to base the process on.</param>
+            <returns>A new <see cref="T:Square9.CustomNode.CaptureProcess"/> held in memory.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CustomNode.CreateProcessByWorkflowName(System.String,System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:Square9.CustomNode.CaptureProcess"/> based on a workflow by name, beginning at a specific node.
+            This <see cref="T:Square9.CustomNode.CaptureProcess"/> can be inserted into the database by calling the <see cref="M:Square9.CustomNode.Database.InsertProcess(Square9.CustomNode.Process)"/> method.
+            </summary>
+            <param name="path">File to spawn the new process from.</param>
+            <param name="workflowName">Name of workflow to base the process on.</param>
+            <param name="startNode">Name of the node at which to begin the process.</param>
+            <returns>A new <see cref="T:Square9.CustomNode.CaptureProcess"/> held in memory.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CustomNode.SetNextNodeByLinkName(System.String)">
+            <summary>
+            Sets the next node by link name.
+            </summary>
+            <param name="name">Name of the link that refers to the next node.</param>
+        </member>
+        <member name="M:Square9.CustomNode.CustomNode.SetNextNodeByNodeName(System.String)">
+            <summary>
+            Sets the next node by name.
+            </summary>
+            <param name="name">Name of the node that will be next.</param>
+        </member>
+        <member name="M:Square9.CustomNode.CustomNode.LoadConfig``1">
+            <summary>
+            Returns a strongly typed object deserialized from the JSON data in the node.config file included in the custom node .s9n file.
+            </summary>
+            <typeparam name="T">Type of config object.</typeparam>
+            <returns>An object of type T deserialized from the JSON in node.config.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CustomNode.LogHistory(System.String)">
+            <summary>
+            Logs a message to the process history.
+            </summary>
+            <param name="message">Message to log to the process history.</param>
+        </member>
+        <member name="M:Square9.CustomNode.CustomNode.Prepare(Square9.CustomNode.Helpers.NodeHelper,Square9.CustomNode.Helpers.ProcessHelper,System.Collections.Generic.Dictionary{System.String,Square9.CustomNode.Setting},Square9.CustomNode.ProcessType)">
+            <summary>
+            A method that the engine runs to prepare the custom node for execution. 
+            Do not call this method from your <see cref="T:Square9.CustomNode.CustomNode"/> code.
+            </summary>
+            <param name="nodeHelper">Node helper provided by engine.</param>
+            <param name="processHelper">Process helper provided by engine.</param>
+            <param name="nodeSettings">Node settings.</param>
+            <param name="processType">Process type.</param>
+        </member>
+        <member name="P:Square9.CustomNode.CustomNode.Helper">
+            <summary>
+            Helper class provided by the engine at runtime. 
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.ProcessStatus">
+            <summary>
+            Specifies the process status.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.ProcessStatus.Complete">
+            <summary>
+            Process is complete.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.ProcessStatus.Ready">
+            <summary>
+            Process is ready to be picked up by the engine and moved to its next node.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.ProcessStatus.Validation">
+            <summary>
+            Process awaits validation.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.ProcessStatus.Errored">
+            <summary>
+            Process has errored out.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.ProcessType">
+            <summary>
+            Specifies the process type.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.ProcessType.GlobalCapture">
+            <summary>
+            GlobalCapture process.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.ProcessType.GlobalAction">
+            <summary>
+            GlobalAction process.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.PropertyComparator">
+            <summary>
+            Specifies logical comparators used to compare property values.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.PropertyComparator.Equals">
+            <summary>
+            Supplied value is equal to the database value.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.PropertyComparator.NotEquals">
+            <summary>
+            Supplied value is not equal to the database value.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.PropertyComparator.Contains">
+            <summary>
+            Supplied value contains the database value.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.PropertyComparator.GreaterThan">
+            <summary>
+            Supplied value is greater than the database value.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.PropertyComparator.GreaterThanOrEqualTo">
+            <summary>
+            Supplied value is greater than or equal to the database value.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.PropertyComparator.LessThan">
+            <summary>
+            Supplied value is less than the database value.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.PropertyComparator.LessThanOrEqualTo">
+            <summary>
+            Supplied value is less than or equal to the database value.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.QueryOperator">
+            <summary>
+            Specifies logical operators used to execute process queries.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.QueryOperator.And">
+            <summary>
+            Logical AND operator.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.QueryOperator.Or">
+            <summary>
+            Logical OR operator.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.Database">
+            <summary>
+            Represents a connected MongoDB database, containing functions for interacting with the processes within MongoDB.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.Database.GetProcessById(System.Int32)">
+            <summary>
+            Gets a <see cref="T:Square9.CustomNode.Process"/> from the process database by process ID.
+            </summary>
+            <param name="id">ID of the process to retrieve.</param>
+            <returns><see cref="T:Square9.CustomNode.Process"/> object.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Database.GetProcessesByProperty(System.String,System.String,Square9.CustomNode.PropertyComparator)">
+            <summary>
+            Queries the MongoDB database for a list of <see cref="T:Square9.CustomNode.Process"/>es that satisfy a property match.
+            </summary>
+            <param name="propertyName">Name of the property to match.</param>
+            <param name="propertyValue">Value of the property to match.</param>
+            <param name="condition"><see cref="T:Square9.CustomNode.PropertyComparator"/> to use for the property value comparison.</param>
+            <returns>List of <see cref="T:Square9.CustomNode.Process"/> objects.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Database.GetProcessesByStatus(Square9.CustomNode.ProcessStatus)">
+            <summary>
+            Queries the MongoDB database for a list of <see cref="T:Square9.CustomNode.Process"/>es of a specific status.
+            </summary>
+            <param name="status"><see cref="T:Square9.CustomNode.ProcessStatus"/> of the processes to match.</param>
+            <returns>List of <see cref="T:Square9.CustomNode.Process"/> objects.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Database.GetProcessesByWorkflowName(System.String)">
+            <summary>
+            Queries the MongoDB database for a list of <see cref="T:Square9.CustomNode.Process"/>es from a specific workflow.
+            </summary>
+            <param name="workflowName">Name of the matching workflow.</param>
+            <returns>List of <see cref="T:Square9.CustomNode.Process"/> objects.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Database.GetProcessesByQuery(System.Collections.Generic.List{Square9.CustomNode.ProcessFilter},Square9.CustomNode.QueryOperator)">
+            <summary>
+            Queries the MongoDB database for a list of <see cref="T:Square9.CustomNode.Process"/>es based on a query of combined <see cref="T:Square9.CustomNode.ProcessFilter"/>s.
+            </summary>
+            <param name="query">List of <see cref="T:Square9.CustomNode.ProcessFilter"/>s combined to make a single query.</param>
+            <param name="queryOperator">Logical operator used to connect the filters of the query.</param>
+            <returns>List of <see cref="T:Square9.CustomNode.Process"/> objects.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Database.InsertProcess(Square9.CustomNode.Process)">
+            <summary>
+            Inserts a new <see cref="T:Square9.CustomNode.Process"/> into the process database.
+            </summary>
+            <param name="process"><see cref="T:Square9.CustomNode.Process"/> to insert into the database.</param>
+            <returns>Id of inserted process.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Database.UpdateProcess(Square9.CustomNode.Process)">
+            <summary>
+            Updates an existing <see cref="T:Square9.CustomNode.Process"/> in the process database.
+            </summary>
+            <param name="process"><see cref="T:Square9.CustomNode.Process"/> to update in the database.</param>
+        </member>
+        <member name="M:Square9.CustomNode.Database.DeleteProcessById(System.Int32)">
+            <summary>
+            Deletes a process from the process database by process ID.
+            </summary>
+            <param name="id">ID of the process to delete.</param>
+        </member>
+        <member name="T:Square9.CustomNode.Engine">
+            <summary>
+            Represents the executing engine, containing methods and properties pertaining to engine information.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Engine.ServiceName">
+            <summary>
+            The service name of the executing engine.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.Engine.GetCaptureApiClient">
+            <summary>
+            Gets an <see cref="T:System.Net.Http.HttpClient"/> object configured to make calls to the CaptureApi associated with the executing engine.
+            If this method is called inside a <see cref="T:Square9.CustomNode.CaptureImporter"/>, a license may be consumed.
+            </summary>
+            <returns><see cref="T:System.Net.Http.HttpClient"/> associated with the executing engine.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Engine.GetSquare9ApiClient(System.Int32)">
+            <summary>
+            Gets an <see cref="T:System.Net.Http.HttpClient"/> object configured to make calls to a Square9 API associated with a specific Square9 API Portal.
+            </summary>
+            <param name="square9ApiPortalId">ID of the Square9 API portal.</param>
+            <returns><see cref="T:System.Net.Http.HttpClient"/> associated with the executing engine.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Engine.GetEngineConfigSetting(System.String)">
+            <summary>
+            Gets a value from the engine app.config file by key name.
+            Returns a null if no setting is found.
+            </summary>
+            <param name="key">Key of the config value.</param>
+            <returns>String value from the config file.</returns>
+        </member>
+        <member name="T:Square9.CustomNode.Process">
+            <summary>
+            Represents a process in memory, containing properties, methods and classes for use in process manipulation.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Process.Id">
+            <summary>
+            Id of the process.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Process.Workflow">
+            <summary>
+            Dynamic object containing the workflow that this process is based on. 
+            Changes made to this object will not be saved. 
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Process.ProcessType">
+            <summary>
+            Type of the process.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Process.Properties">
+            <summary>
+            A class of helper methods for interacting with the properties of the current process.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.Process.AddHistory(System.String)">
+            <summary>
+            Adds a history entry to the <see cref="T:Square9.CustomNode.Process"/>.
+            </summary>
+            <param name="message">Message to add to the process history.</param>
+        </member>
+        <member name="M:Square9.CustomNode.Process.GetProcessDynamic">
+            <summary>
+            Gets the currently executing process from the engine in dynamic object form.
+            You can save changes to the process by altering this object and passing it to the <see cref="M:Square9.CustomNode.Process.SaveProcessDynamic(System.Object)"/> function.
+            </summary>
+            <returns>Dynamic process object.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Process.SaveProcessDynamic(System.Object)">
+            <summary>
+            Overwrites the current process with the provided dynamic process object.
+            Throws a <see cref="T:System.Runtime.Serialization.SerializationException"/> if the object cannot be deserialized back into the managed process object.
+            </summary>
+            <param name="process">Dynamic process object to save to the database.</param>
+        </member>
+        <member name="M:Square9.CustomNode.Process.SetCurrentNodeByNodeName(System.String)">
+            <summary>
+            Sets the current node of a <see cref="T:Square9.CustomNode.Process"/> to a new node by name.
+            </summary>
+            <param name="name">Name of the node.</param>
+        </member>
+        <member name="M:Square9.CustomNode.Process.SetStatus(Square9.CustomNode.ProcessStatus)">
+            <summary>
+            Sets the <see cref="T:Square9.CustomNode.ProcessStatus"/> of the process.
+            </summary>
+            <param name="status"><see cref="T:Square9.CustomNode.ProcessStatus"/> to set the process status to.</param>
+        </member>
+        <member name="T:Square9.CustomNode.Properties">
+            <summary>
+            Represents the properties of a process, containing methods for getting and setting property values.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.GetPropertyNames">
+            <summary>
+            Gets a list of of property names on the current process.
+            </summary>
+            <returns>List of property names.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.GetPropertyByName(System.String)">
+            <summary>
+            Gets a property object by property name.
+            </summary>
+            <param name="name">Name of the property to get.</param>
+            <returns>Dynamic property object.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.SaveProperty(System.Object)">
+            <summary>
+            Saves a property back to the process.
+            Throws an <see cref="T:System.InvalidOperationException"/> if there is no property on the process by the incoming property's name.
+            Throws a <see cref="T:Newtonsoft.Json.JsonSerializationException"/> if the process cannot de-serialize into the managed process object.
+            </summary>
+            <param name="property">Dynamic property object.</param>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.SetSingleProperty(System.String,System.String)">
+            <summary>
+            Sets the value of a single value process property.
+            </summary>
+            <param name="name">Name of the property to set.</param>
+            <param name="value">Value to set to the property.</param>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.SetMultiValueProperty(System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Sets the value of a multi-value process property.
+            </summary>
+            <param name="name">Name of the property to set.</param>
+            <param name="values">Value(s) to set to the property.</param>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.SetTableFieldProperty(System.String,System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{System.String}})">
+            <summary>
+            Sets the value of a table field process property.
+            </summary>
+            <param name="name">Name of the property to set.</param>
+            <param name="tableValues">Table values to set to the property.</param>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.GetSingleValue(System.String)">
+            <summary>
+            Gets the value of a single value process property.
+            </summary>
+            <param name="name">Name of the property to get.</param>
+            <returns>Value of the property.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.GetMultiValue(System.String)">
+            <summary>
+            Gets the values of a multi-value process property. 
+            </summary>
+            <param name="name">Name of the property to get.</param>
+            <returns>Value(s) of the property.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Properties.GetTableFieldValues(System.String)">
+            <summary>
+            Gets the table field values of a table field process property. Throws an <see cref="T:System.InvalidOperationException"/> if the field is not a table field.
+            </summary>
+            <param name="name">Name of the property to get.</param>
+            <returns>Table field values of the property.</returns>
+        </member>
+        <member name="T:Square9.CustomNode.Settings">
+            <summary>
+            Represents the settings set by a custom node, containing methods for retrieving setting values.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Settings.NodeSettings">
+            <summary>
+            Dictionary containing the settings set by the Custom Node.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.Settings.GetSetting(System.String)">
+            <summary>
+            Gets a <see cref="T:Square9.CustomNode.Setting"/> from the <see cref="P:Square9.CustomNode.Settings.NodeSettings"/> dictionary by setting name.
+            Throws a <see cref="T:System.Collections.Generic.KeyNotFoundException"/> if the key is not found.
+            </summary>
+            <param name="name">Setting name corresponding with the dictionary key inside of <see cref="P:Square9.CustomNode.Settings.NodeSettings"/></param>
+            <returns>A <see cref="T:Square9.CustomNode.Setting"/> object.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Settings.GetStringSetting(System.String)">
+            <summary>
+            Gets a <see cref="T:System.String"/> value from the <see cref="P:Square9.CustomNode.Settings.NodeSettings"/> dictionary by setting name.
+            Throws a <see cref="T:System.Collections.Generic.KeyNotFoundException"/> if the key is not found.
+            Throws an <see cref="T:System.InvalidCastException"/> if the setting is not a string type.
+            </summary>
+            <param name="name">Setting name corresponding with the dictionary key inside of <see cref="P:Square9.CustomNode.Settings.NodeSettings"/></param>
+            <returns>A <see cref="T:System.String"/> value.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Settings.GetIntSetting(System.String)">
+            <summary>
+            Gets an <see cref="T:System.Int32"/> value from the <see cref="P:Square9.CustomNode.Settings.NodeSettings"/> dictionary by setting name.
+            Throws a <see cref="T:System.Collections.Generic.KeyNotFoundException"/> if the key is not found.
+            Throws an <see cref="T:System.InvalidCastException"/> if the setting is not an integer type.
+            </summary>
+            <param name="name">Setting name corresponding with the dictionary key inside of <see cref="P:Square9.CustomNode.Settings.NodeSettings"/></param>
+            <returns>An <see cref="T:System.Int32"/> value.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Settings.GetBooleanSetting(System.String)">
+            <summary>
+            Gets a <see cref="T:System.Boolean"/> value from the <see cref="P:Square9.CustomNode.Settings.NodeSettings"/> dictionary by setting name.
+            Throws a <see cref="T:System.Collections.Generic.KeyNotFoundException"/> if the key is not found.
+            Throws an <see cref="T:System.InvalidCastException"/> if the setting is not a boolean type.
+            </summary>
+            <param name="name">Setting name corresponding with the dictionary key inside of <see cref="P:Square9.CustomNode.Settings.NodeSettings"/></param>
+            <returns>A <see cref="T:System.Boolean"/> value.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.Settings.GetListSetting(System.String)">
+            <summary>
+            Gets a <see cref="T:System.Collections.Generic.List`1"/> value from the <see cref="P:Square9.CustomNode.Settings.NodeSettings"/> dictionary by setting name.
+            Throws a <see cref="T:System.Collections.Generic.KeyNotFoundException"/> if the key is not found.
+            Throws an <see cref="T:System.InvalidCastException"/> if the property is not a list type.
+            </summary>
+            <param name="name">Setting name corresponding with the dictionary key inside of <see cref="P:Square9.CustomNode.Settings.NodeSettings"/></param>
+            <returns>A <see cref="T:System.Collections.Generic.List`1"/> of values.</returns>
+        </member>
+        <member name="T:Square9.CustomNode.CaptureImporter">
+            <summary>
+            Parent class for custom GlobalCapture import nodes.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureImporter.Import">
+            <summary>
+            The method that will run when a <see cref="T:Square9.CustomNode.CaptureImporter"/> is picked up by the engine.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureImporter.Engine">
+            <summary>
+            A class of helper methods pertaining to the executing engine.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureImporter.Settings">
+            <summary>
+            A class of helper methods for interacting with the <see cref="T:Square9.CustomNode.Setting"/>s controlled by the interface of the <see cref="T:Square9.CustomNode.CustomNode"/>.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureImporter.Database">
+            <summary>
+            A class of helper methods involving the creation, deletion, and updating of processes in the MongoDB database.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureImporter.NodeDirectory">
+            <summary>
+            Path to the directory containing files extracted from the custom node.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureImporter.Workflow">
+            <summary>
+            Dynamic object containing the executing workflow. 
+            Changes made to this object will not be saved. 
+            </summary>
+            
+        </member>
+        <member name="M:Square9.CustomNode.CaptureImporter.CreateProcess(System.String)">
+            <summary>
+            Creates a new <see cref="T:Square9.CustomNode.Process"/> based on the executing workflow.
+            This <see cref="T:Square9.CustomNode.Process"/> can be inserted into the database by calling the <see cref="M:Square9.CustomNode.Database.InsertProcess(Square9.CustomNode.Process)"/> method.
+            </summary>
+            <param name="path">File to spawn the new process from.</param>
+            <returns>A new <see cref="T:Square9.CustomNode.Process"/> held in memory.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureImporter.CreateProcess(System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:Square9.CustomNode.Process"/> based on a workflow by name.
+            This <see cref="T:Square9.CustomNode.Process"/> can be inserted into the database by calling the <see cref="M:Square9.CustomNode.Database.InsertProcess(Square9.CustomNode.Process)"/> method.
+            </summary>
+            <param name="path">File to spawn the new process from.</param>
+            <param name="workflowName">Name of workflow to base the process on.</param>
+            <returns>A new <see cref="T:Square9.CustomNode.Process"/> held in memory.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureImporter.LoadConfig``1">
+            <summary>
+            Returns a strongly typed object deserialized from the JSON data in the node.config file included in the custom node .s9n file.
+            </summary>
+            <typeparam name="T">Type of config object.</typeparam>
+            <returns>An object deserialized from the JSON in node.config.</returns>
+        </member>
+        <member name="M:Square9.CustomNode.CaptureImporter.Prepare(Square9.CustomNode.Helpers.BaseHelper,System.Collections.Generic.Dictionary{System.String,Square9.CustomNode.Setting})">
+            <summary>
+            A method that the engine runs to prepare the custom node for execution. 
+            Do not call this method from your <see cref="T:Square9.CustomNode.ActionImporter"/> code.
+            </summary>
+            <param name="baseHelper">Helper class supplied by the engine at runtime.</param>
+            <param name="nodeSettings">Dictionary of node settings.</param>
+        </member>
+        <member name="P:Square9.CustomNode.CaptureImporter.Helper">
+            <summary>
+            Helper class provided by the engine at runtime. 
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.ProcessFilter">
+            <summary>
+            Abstract class representing a process filter, for use in combining into a process query.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.PropertyFilter">
+            <summary>
+            Represents a process filter by property.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.PropertyFilter.#ctor(System.String,System.String,Square9.CustomNode.PropertyComparator)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Square9.CustomNode.PropertyFilter"/> class with a specified property name, value, and comparator.
+            </summary>
+            <param name="propertyName">Name of the property to match.</param>
+            <param name="propertyValue">Value of the property to match.</param>
+            <param name="propertyComparator"><see cref="P:Square9.CustomNode.PropertyFilter.PropertyComparator"/> to use for the property value comparison.</param>
+        </member>
+        <member name="P:Square9.CustomNode.PropertyFilter.PropertyName">
+            <summary>
+            Name of the property to match.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.PropertyFilter.PropertyValue">
+            <summary>
+            Value of the property to match.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.PropertyFilter.PropertyComparator">
+            <summary>
+            <see cref="P:Square9.CustomNode.PropertyFilter.PropertyComparator"/> to use for the property value comparison.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.WorkflowNameFilter">
+            <summary>
+            Represents a process filter by workflow name.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.WorkflowNameFilter.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Square9.CustomNode.WorkflowNameFilter"/> class with a specified workflow name.
+            </summary>
+            <param name="workflowName">Name of the workflow to match.</param>
+        </member>
+        <member name="P:Square9.CustomNode.WorkflowNameFilter.WorkflowName">
+            <summary>
+            Name of the workflow to match.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.StatusFilter">
+            <summary>
+            Represents a process filter by process status.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.StatusFilter.#ctor(Square9.CustomNode.ProcessStatus)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Square9.CustomNode.StatusFilter"/> class with a specified process status.
+            </summary>
+            <param name="processStatus"></param>
+        </member>
+        <member name="P:Square9.CustomNode.StatusFilter.ProcessStatus">
+            <summary>
+            Status of the process to match.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.ProcessTypeFilter">
+            <summary>
+            Represents a process filter by process type.
+            </summary>
+        </member>
+        <member name="M:Square9.CustomNode.ProcessTypeFilter.#ctor(Square9.CustomNode.ProcessType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Square9.CustomNode.ProcessTypeFilter"/> class with a specified process type.
+            </summary>
+            <param name="processType"></param>
+        </member>
+        <member name="P:Square9.CustomNode.ProcessTypeFilter.ProcessType">
+            <summary>
+            Type of the process to match.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.Setting">
+            <summary>
+            Represents a node setting controlled by custom node interfaces within GlobalCapture.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Setting.Type">
+            <summary>
+            Type of the value stored on the <see cref="T:Square9.CustomNode.Setting"/>
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Setting.StringValue">
+            <summary>
+            String value for string type settings.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Setting.IntValue">
+            <summary>
+            Integer value for int type settings.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Setting.BooleanValue">
+            <summary>
+            Boolean value for boolean type settings.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Setting.ListValue">
+            <summary>
+            List value for list type settings.
+            </summary>
+        </member>
+        <member name="P:Square9.CustomNode.Setting.Hidden">
+            <summary>
+            Hidden boolean setting.
+            </summary>
+        </member>
+        <member name="T:Square9.CustomNode.SettingType">
+            <summary>
+            An enum containing the possible object types of a <see cref="T:Square9.CustomNode.Setting"/>.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.SettingType.String">
+            <summary>
+            String type.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.SettingType.Int">
+            <summary>
+            Integer type.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.SettingType.Boolean">
+            <summary>
+            Boolean type.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.SettingType.List">
+            <summary>
+            List of strings.
+            </summary>
+        </member>
+        <member name="F:Square9.CustomNode.SettingType.ImportLocation">
+            <summary>
+            String type corresponding to a file import path.
+            </summary>
+        </member>
+    </members>
+</doc>
