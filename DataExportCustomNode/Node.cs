@@ -27,6 +27,7 @@ namespace DataExportCustomNode
             bool AppendToExisting = Settings.GetBooleanSetting("AppendToExisting");
             List<ExportRow> Export = new List<ExportRow>();
             Square9API Connection;
+            string UniqueID = Guid.NewGuid().ToString();
 
             try
             {
@@ -66,7 +67,7 @@ namespace DataExportCustomNode
                                 exportValue.Type = 1;
                                 break;
                             case "IID":
-                                exportValue.Value = Guid.NewGuid().ToString();
+                                exportValue.Value = UniqueID;
                                 exportValue.Type = 1;
                                 break;
                             default:
@@ -104,7 +105,14 @@ namespace DataExportCustomNode
                                 if (ValidateJSON(FieldOptions[i])) //Apply formatting if it exists
                                 {
                                     FieldOptions Options = JsonConvert.DeserializeObject<FieldOptions>(FieldOptions[i]);
-                                    exportValue = ApplyFormatting(exportValue, Options);
+                                    try
+                                    {
+                                        exportValue = ApplyFormatting(exportValue, Options);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw new Exception($"Could Not Apply Formatting: {Fields[i]} | {ex.Message}");
+                                    }
                                 }
                                 break;
                         }
@@ -242,10 +250,13 @@ namespace DataExportCustomNode
                         LogHistory($"Data Exported to SQL: {TableName}");
                         break;
                 }
+
+                SetNextNodeByLinkName("Exported");
             }
             catch (Exception ex)
             {
                 LogHistory($"{ex.Message}");
+                SetNextNodeByLinkName("Error");
             }
         }
         internal ExportValue ApplyFormatting(ExportValue exportValue, FieldOptions fieldOptions)
