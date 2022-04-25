@@ -41,9 +41,6 @@
     <Reference Include="Square9.CustomNode">
       <HintPath>NodeSDK\Square9.CustomNode.dll</HintPath>
     </Reference>
-    <Reference Include="Square9APIHelperLibrary, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Square9APIHelperLibrary.0.0.4\lib\net472\Square9APIHelperLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -62,10 +59,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="images\Square9icon.ico" />
-    <Content Include="images\Square9icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
