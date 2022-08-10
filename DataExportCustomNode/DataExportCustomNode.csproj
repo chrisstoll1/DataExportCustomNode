@@ -53,8 +53,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\Doc.cs" />
+    <Compile Include="Helpers\ExportRow.cs" />
+    <Compile Include="Helpers\ExportValue.cs" />
+    <Compile Include="Helpers\Field.cs" />
+    <Compile Include="Helpers\FieldItem.cs" />
+    <Compile Include="Helpers\FieldOptions.cs" />
+    <Compile Include="Helpers\Replacement.cs" />
+    <Compile Include="Helpers\Result.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RestRequests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

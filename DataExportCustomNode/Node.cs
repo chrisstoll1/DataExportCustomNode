@@ -6,9 +6,8 @@ using Square9.CustomNode;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
-using RestSharp;
-using RestSharp.Authenticators;
-using System.Net;
+using System.Net.Http;
+using DataExportCustomNode.Helpers;
 
 namespace DataExportCustomNode
 {
@@ -27,29 +26,23 @@ namespace DataExportCustomNode
             bool IncludeColumnHeaders = Settings.GetBooleanSetting("IncludeColumnHeaders");
             bool AppendToExisting = Settings.GetBooleanSetting("AppendToExisting");
             List<ExportRow> Export = new List<ExportRow>();
-            Square9APIHelper Connection;
+            Result GSDocument = null;
             string UniqueID = Guid.NewGuid().ToString();
 
             try
             {
-                //Extract Square9API info from built in client
-                using (var square9Api = Engine.GetSquare9ApiClient())
+                //Get the GlobalSearch document
+                using (HttpClient Client = Engine.GetSquare9ApiClient())
                 {
-                    LogHistory($"{JsonConvert.SerializeObject(square9Api.GetAsync("licenses?format=json").Result)}");
-                    string[] Creds = new string(Convert.FromBase64String(square9Api.DefaultRequestHeaders.Authorization.Parameter).Select(b => (char)b).ToArray()).Split(':');
-                    string Username = Creds[0];
-                    string Password = Creds[1];
-                    string Endpoint = square9Api.BaseAddress.ToString().Replace("api/", "");
-                    Connection = new Square9APIHelper(Endpoint, Username, Password);
+                    RestRequests Connection = new RestRequests(Client);
+                    string SecureId = Connection.GetDocumentSecureID(Process.Document.DatabaseId, Process.Document.ArchiveId, Process.Document.DocumentId);
+                    string DocumentResult = Connection.GetDocument(Process.Document.DatabaseId, Process.Document.ArchiveId, Process.Document.DocumentId, SecureId);
+                    GSDocument = JsonConvert.DeserializeObject<Result>(DocumentResult);
+                    LogHistory(JsonConvert.SerializeObject(GSDocument));
                 }
 
-                //Get Document
-                Connection.CreateLicense();
-                Result GSDocument = Connection.GetArchiveDocument(Process.Document.DatabaseId, Process.Document.ArchiveId, Process.Document.DocumentId);
-                Connection.DeleteLicense();
-
                 //Build the export based on specified fields
-                foreach (var Document in GSDocument.Docs) 
+                foreach (var Document in GSDocument.Docs)
                 {
                     ExportRow exportRow = new ExportRow();
                     exportRow.Values = new List<ExportValue>();
@@ -154,7 +147,7 @@ namespace DataExportCustomNode
                                 do
                                 {
                                     fileCount++;
-                                } 
+                                }
                                 while (System.IO.File.Exists($"{name}_{fileCount}.{ext}"));
                                 ExportPath = $"{name}_{fileCount}.{ext}";
                                 exists = false;
@@ -284,7 +277,7 @@ namespace DataExportCustomNode
                         formattedValue.Value = float.Parse(exportValue.Value).ToString(fieldOptions.Format);
                         break;
                 }
-                exportValue.Type = 1; //Set the type to String after formatting is applied
+                exportValue.Type = 1; //Set the SQL Column type to varchar after formatting is applied
             }
             return formattedValue;
         }
@@ -299,172 +292,6 @@ namespace DataExportCustomNode
             {
                 return false;
             }
-        }
-        internal class ExportRow
-        {
-            public List<ExportValue> Values { get; set; }
-        }
-        internal class ExportValue
-        {
-            public string ColumnName { get; set; }
-            public int Type { get; set; }
-            public string Value { get; set; }
-        }
-        internal class FieldOptions
-        {
-            public string Format { get; set; }
-            public List<Replacement> Replacements { get; set; }
-        }
-        internal class Replacement
-        {
-            public string P { get; set; }
-            public string R { get; set; }
-        }
-        internal class Square9APIHelper
-        {
-            private RestClient ApiClient;
-            public License CachedLicense;
-            public Square9APIHelper(string endpoint, string username, string password)
-            {
-                ApiClient = new RestClient(endpoint)
-                {
-                    Authenticator = new HttpBasicAuthenticator(username, password)
-                };
-            }
-
-            public License CreateLicense()
-            {
-                var Request = new RestRequest("api/licenses");
-                var Response = ApiClient.Execute<License>(Request);
-                if (Response.StatusCode != HttpStatusCode.OK)
-                {
-                    if (Response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new Exception("Unable to get a License: The passed user is Unauthorized.");
-                    }
-                    else if (Response.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        throw new Exception($"Unable to get a License: {Response.Content}");
-                    }
-                    else if (Response.StatusCode == HttpStatusCode.NotFound)
-                    {
-                        throw new Exception("Unable to get a License: Unable to connect to the license server, server not found.");
-                    }
-                    else if (Response.StatusCode == HttpStatusCode.Forbidden)
-                    {
-                        throw new Exception("Unable to get a License: 403 Forbidden.");
-                    }
-                    else if (Response.StatusCode == HttpStatusCode.RequestTimeout)
-                    {
-                        throw new Exception("Unable to get a License: The Request Timed out.");
-                    }
-                    else
-                    {
-                        throw new Exception("Unable to get a License: Please check your connection settings.");
-                    }
-                }
-                CachedLicense = Response.Data;
-                return Response.Data;
-            }
-            public void DeleteLicense(License license = null)
-            {
-                if (license != null || CachedLicense != null)
-                {
-                    string token = (license != null) ? license.Token : CachedLicense.Token;
-                    var Request = new RestRequest($"api/licenses/{token}");
-                    var Response = ApiClient.Execute(Request);
-                    if (Response.StatusCode != HttpStatusCode.OK)
-                    {
-                        throw new Exception($"Unable to release license token: {Response.Content}");
-                    }
-                    CachedLicense = null; 
-                }
-            }
-            public Result GetArchiveDocument(int databaseId, int archiveId, int documentId)
-            {
-                var Request = new RestRequest($"api/dbs/{databaseId}/archives/{archiveId}?DocumentID={documentId}&Token={CachedLicense.Token}");
-                var SecureIDResponse = ApiClient.Execute(Request);
-                if (SecureIDResponse.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new Exception($"Unable to get document Secure ID: {SecureIDResponse.Content}");
-                }
-                string SecureID = SecureIDResponse.Content;
-                Console.WriteLine(SecureID);
-                var DocRequest = new RestRequest($"api/dbs/{databaseId}/archives/{archiveId}/documents/{documentId}?SecureId={SecureID}");
-                var Response = ApiClient.Execute<Result>(DocRequest);
-                if (SecureIDResponse.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new Exception($"Unable to get document: {Response.Content}");
-                }
-                return Response.Data;
-            }
-        }
-        internal class Result
-        {
-            public Result() { }
-            public int Count { get; set; }
-            public List<Doc> Docs { get; set; }
-            public List<Field> Fields { get; set; }
-            public string FolderOptions { get; set; }
-            public bool PdfConvertStatus { get; set; }
-            public bool Terms { get; set; }
-            public int WorkflowStatus { get; set; }
-
-        }
-        internal class Field
-        {
-            public Field() { }
-            public int Id { get; set; }
-            public int List { get; set; }
-            public int ListF1 { get; set; }
-            public int ListF2 { get; set; }
-            public string Mask { get; set; }
-            public string Name { get; set; }
-            public int Parent { get; set; }
-            public int Prop { get; set; }
-            public string RegEx { get; set; }
-            public int Size { get; set; }
-            public int Type { get; set; }
-        }
-        internal class License
-        {
-            public License() { }
-
-            public string AuthServer { get; set; }
-            public bool Active { get; set; }
-            public DateTime DateAccessed { get; set; }
-            public DateTime DateCreated { get; set; }
-            public string Domain { get; set; }
-            public string IPAddress { get; set; }
-            public int Reg { get; set; }
-            public string Token { get; set; }
-            public int Type { get; set; }
-            public string Username { get; set; }
-        }
-        internal class FieldItem
-        {
-            public FieldItem() { }
-            public int Id { get; set; }
-            public List<string> Mval { get; set; }
-            public string Val { get; set; }
-        }
-        internal class Doc
-        {
-            public Doc() { }
-            public List<FieldItem> Fields { get; set; }
-            public string FileType { get; set; }
-            public string Hash { get; set; }
-            public int Hits { get; set; }
-            public int Id { get; set; }
-            public int Permissions { get; set; }
-            public int RevisionOptions { get; set; }
-            public bool Revisions { get; set; }
-            public int RootVersionId { get; set; }
-            public int Tid { get; set; }
-            public bool User_Name { get; set; }
-            public int Version { get; set; }
-            public int VersionArchive { get; set; }
-
         }
     }
 
