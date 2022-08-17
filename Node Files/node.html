@@ -11,25 +11,24 @@
 	<body node-height="550">
 
 		<div class="modal-body">
-
+			<!-- Export Type -->
 			<div class="row">
-				<div class="col-md-12 form-group required">
-					<label class="control-label">Export Type</label><req> *</req>
-					<div class="form-check">
-						<input class="form-check-input" type="radio" name="exportTypeRadio" id="csvRadio" value="CSV" setting="ExportType" setting-type="string">
-						<label class="form-check-label" for="csvRadio">
+				<div class="col-md-12">
+					<label>Export Type</label><req> *</req>
+					<form>
+						<label class="radio-inline">
+							<input type="radio" name="exportTypeRadio" id="csvRadio" value="CSV" setting="ExportType" setting-type="string">
 							CSV
 						</label>
-					</div>
-					<div class="form-check">
-						<input class="form-check-input" type="radio" name="exportTypeRadio" id="sqlRadio" value="SQL" setting="ExportType" setting-type="string">
-						<label class="form-check-label" for="sqlRadio">
+						<label class="radio-inline">
+							<input type="radio" name="exportTypeRadio" id="sqlRadio" value="SQL" setting="ExportType" setting-type="string">
 							SQL
 						</label>
-					</div>
+					</form>
 				</div>
 			</div>
 			
+			<!-- Export Path -->
 			<div class="row">
 				<div class="col-md-12 form-group required">
 					<label id="exportPathLabel" class="control-label"></label><req> *</req>
@@ -37,6 +36,7 @@
 				</div>
 			</div>
 
+			<!-- Table Name -->
 			<div class="row">
 				<div class="col-md-12 form-group tablename-wrapper">
 					<label class="control-label">Table Name</label>
@@ -44,6 +44,7 @@
 				</div>
 			</div>
 
+			<!-- Delimiter -->
 			<div class="row">
 				<div class="col-md-12 form-group delimiter-wrapper">
 					<label class="control-label">Delimiter</label>
@@ -51,6 +52,7 @@
 				</div>
 			</div>
 
+			<!-- CSV Options -->
 			<div class="row">
 				<div class="col-md-12 form-group checkbox-wrapper">
 					<div class="checkbox-inline">
@@ -76,7 +78,7 @@
 						</div>
 						<div class="modal-body">
 							<label class="control-label">Format</label>
-							<input type="text" id="format" class="form-control" placeholder="mm/dd/yyyy">
+							<input type="text" id="format" class="form-control" > <!-- placeholder="mm/dd/yyyy" -->
 							<label class="control-label" style="padding-top: 10px;">Replacement</label>
 							<div class="panel panel-default">
 								<div id="headers" class="tab-pane fade in active">
@@ -109,6 +111,7 @@
 				</div>
 			</div>
 
+			<!-- Field Mapping -->
 			<div class="row">
 				<div class="col-md-12">
 					<label class="control-label">Field Mapping</label>

@@ -27,6 +27,7 @@ $(".addRow").click(function() {
 //Add new row for Replacement table
 $(".replacementAddRow").click(function() {
     replacementAddRow();
+    replacementTableUpdated();
 });
 function replacementAddRow(patterMatch = "", replacement = "") {
 	var allListElements = document.querySelectorAll("[replacement-repeat-list]");
@@ -46,6 +47,7 @@ $("body").on("click", "#replacementRemoveRow", function () {
         $(this).closest("tr").remove();
         rebuildOptionsJson();
     }
+    replacementTableUpdated();
 });
 
 //Remove row from Field Mapping table
@@ -68,13 +70,13 @@ $('input[type=radio][name=exportTypeRadio]').change(function() {
 function refreshLabels() {
     if ($("#csvRadio").prop('checked')){
         $("#exportPathLabel").text("Export Path");
-        $("#exportPath").attr("placeholder", "C:/Export.csv");
+        // $("#exportPath").attr("placeholder", "C:/Export.csv");
         $(".checkbox-wrapper").show();
         $(".tablename-wrapper").hide();
         $(".delimiter-wrapper").show();
     }else if ($("#sqlRadio").prop('checked')){
         $("#exportPathLabel").text("Connection String");
-        $("#exportPath").attr("placeholder", "Server=(local)\\GetSmart; Database=S9SDATACACHE; Trusted_Connection=yes;");
+        // $("#exportPath").attr("placeholder", "Server=(local)\\GetSmart; Database=S9SDATACACHE; Trusted_Connection=yes;");
         $(".checkbox-wrapper").hide();
         $(".tablename-wrapper").show();
         $(".delimiter-wrapper").hide();
@@ -137,12 +139,25 @@ $("body").on("click", "#openRowOptions", function () {
             replacementAddRow(jsonData.replacements[i].p, jsonData.replacements[i].r);
         }
     } 
+
+    replacementTableUpdated();
 });
 
 //On options field change
 $("body").on("change", "#replacementBody, #format", function () {
     rebuildOptionsJson();
 });
+
+//Disable Remove Row Button When only 1 row remains
+function replacementTableUpdated(){
+    if ($("#replacementBody").children().length == 1){
+        $("#replacementRemoveRow").addClass("removeRowDisabled");
+    }else{
+        $("#replacementBody").children().each(function () {
+            $(this).closest("tr").find("#replacementRemoveRow").removeClass("removeRowDisabled");
+        });
+    }
+}
 
 //Rebuilds the options object and sets it to the fields option setting
 function rebuildOptionsJson() {

@@ -20,14 +20,20 @@
 
 #replacementRemoveRow {
     color: darkred;
-    display: inline-block;
-    vertical-align: middle;
     line-height: 40px;
+    height: 34px;
+    display: flex;
+    align-items: center;
 }
 
 #replacementRemoveRow:hover {
     color: red;
     cursor: pointer;
+}
+
+#replacementRemoveRow.removeRowDisabled {
+    color: #777;
+    cursor: not-allowed;
 }
 
 .addRow {
@@ -85,4 +91,18 @@ req {
     display: inline-block;
     text-align: left;
     vertical-align: middle;
+}
+
+.radio-inline {
+    padding-left: 30px;
+    padding-right: 60px;
+}
+
+.form-check-label {
+    font-size: 11px;
+    padding-top: 3px;
+}
+
+th {
+    font-size: 14px;
 }

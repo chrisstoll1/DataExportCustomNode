@@ -38,7 +38,6 @@ namespace DataExportCustomNode
                     string SecureId = Connection.GetDocumentSecureID(Process.Document.DatabaseId, Process.Document.ArchiveId, Process.Document.DocumentId);
                     string DocumentResult = Connection.GetDocument(Process.Document.DatabaseId, Process.Document.ArchiveId, Process.Document.DocumentId, SecureId);
                     GSDocument = JsonConvert.DeserializeObject<Result>(DocumentResult);
-                    LogHistory(JsonConvert.SerializeObject(GSDocument));
                 }
 
                 //Build the export based on specified fields
