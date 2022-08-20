@@ -1,9 +1,4 @@
 let $selectedField;
-let cachedExportPath = {
-    connectionString: "",
-    exportPath: "",
-    initial: true
-}
 
 //Enable sorting on both tables
 $('#mappingBody').sortable({handle: '#handle', containment: "#mappingBody"});
@@ -14,13 +9,9 @@ $('#replacementBody').sortable({
         rebuildOptionsJson();
     }
 });
-
-//Setup
-cacheExportPathValue();
 refreshLabels();
 
-//On field mapping add row clicked
-//Add new row for field mapping table
+//Add new row for Field Mapping table
 $(".addRow").click(function() {
 	var allListElements = document.querySelectorAll("[repeat-list]");
 	var lastListElement = allListElements[allListElements.length - 1];
@@ -33,13 +24,23 @@ $(".addRow").click(function() {
 	$(newListElement).find("#columnName").val("");
 });
 
-//On replacement add row clicked
+//Add new row for Replacement table
 $(".replacementAddRow").click(function() {
     replacementAddRow();
     replacementTableUpdated();
 });
+function replacementAddRow(patterMatch = "", replacement = "") {
+	var allListElements = document.querySelectorAll("[replacement-repeat-list]");
+	var lastListElement = allListElements[allListElements.length - 1];
 
-//On replacement remove row clicked
+	lastListElement.parentNode.appendChild( lastListElement.cloneNode(true) );
+	
+	var newListElements = document.querySelectorAll("[replacement-repeat-list]");
+	var newListElement = newListElements[newListElements.length - 1];
+	$(newListElement).find("#patternMatch").val(patterMatch);
+	$(newListElement).find("#replacement").val(replacement);
+}
+
 //Remove row from replacement table
 $("body").on("click", "#replacementRemoveRow", function () {
     if ($("#replacementBody").children().length > 1){
@@ -49,29 +50,40 @@ $("body").on("click", "#replacementRemoveRow", function () {
     replacementTableUpdated();
 });
 
-//On field mapping remove row clicked
-//Remove row from field mapping table
+//Remove row from Field Mapping table
 $("body").on("click", "#removeRow", function () {
     if ($("#mappingBody").children().length > 1){
         $(this).closest("tr").remove();
     }
 });
 
-//On field select drop-down change
-//Set column name default value
+//Set Column Name default value
 $("body").on("change", "#fieldSelect", function () {
     $(this).closest("tr").find("input").val(this[this.selectedIndex].label);
     console.log(this);
 });
 
-//On export type change
-//Refresh labels
+//Refresh labels on export type change
 $('input[type=radio][name=exportTypeRadio]').change(function() {
     refreshLabels();
 });
+function refreshLabels() {
+    if ($("#csvRadio").prop('checked')){
+        $("#exportPathLabel").text("Export Path");
+        // $("#exportPath").attr("placeholder", "C:/Export.csv");
+        $(".checkbox-wrapper").show();
+        $(".tablename-wrapper").hide();
+        $(".delimiter-wrapper").show();
+    }else if ($("#sqlRadio").prop('checked')){
+        $("#exportPathLabel").text("Connection String");
+        // $("#exportPath").attr("placeholder", "Server=(local)\\GetSmart; Database=S9SDATACACHE; Trusted_Connection=yes;");
+        $(".checkbox-wrapper").hide();
+        $(".tablename-wrapper").show();
+        $(".delimiter-wrapper").hide();
+    }
+}
 
-//On field options clicked
-//Field options dropdown UI logic
+//Field Options dropdown UI logic
 $("body").on("click", "#optionDropDown", function () {
     if ($("#mappingBody").children().length == 1){
         $(this).closest("div").find("ul").children().last().attr('class', 'disabled');
@@ -92,7 +104,6 @@ $("body").on("click", "#optionDropDown", function () {
     }
 });
 
-//On open row options clicked
 //Load options from field
 $("body").on("click", "#openRowOptions", function () {
     $("#format").val("");
@@ -165,51 +176,4 @@ function rebuildOptionsJson() {
     // console.log(JSON.parse($selectedField.find("#options").val()));
 }
 
-//Add new row for replacement table
-function replacementAddRow(patterMatch = "", replacement = "") {
-	var allListElements = document.querySelectorAll("[replacement-repeat-list]");
-	var lastListElement = allListElements[allListElements.length - 1];
-
-	lastListElement.parentNode.appendChild( lastListElement.cloneNode(true) );
-	
-	var newListElements = document.querySelectorAll("[replacement-repeat-list]");
-	var newListElement = newListElements[newListElements.length - 1];
-	$(newListElement).find("#patternMatch").val(patterMatch);
-	$(newListElement).find("#replacement").val(replacement);
-}
-
-//Cache the loaded in export path
-function cacheExportPathValue(){
-    if ($("#csvRadio").prop('checked')){
-        cachedExportPath.exportPath = $("#exportPath").val(); 
-    }else if ($("#sqlRadio").prop('checked')){
-        cachedExportPath.connectionString = $("#exportPath").val();
-    }
-}
-
-//Show/Hide UI components, change labels, load cached values
-function refreshLabels() {
-    if ($("#csvRadio").prop('checked')){
-        if (!cachedExportPath.initial){
-            cachedExportPath.connectionString = $("#exportPath").val();
-        }
-        $("#exportPath").val(cachedExportPath.exportPath);
-       
-        $("#exportPathLabel").text("Export Path");
-        $(".checkbox-wrapper").show();
-        $(".tablename-wrapper").hide();
-        $(".delimiter-wrapper").show();
-    }else if ($("#sqlRadio").prop('checked')){
-        if (!cachedExportPath.initial){
-            cachedExportPath.exportPath = $("#exportPath").val();
-        }
-        $("#exportPath").val(cachedExportPath.connectionString);
-
-        $("#exportPathLabel").text("Connection String");
-        $(".checkbox-wrapper").hide();
-        $(".tablename-wrapper").show();
-        $(".delimiter-wrapper").hide();
-    }
-    cachedExportPath.initial = false;
-}
 
