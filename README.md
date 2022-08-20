@@ -4,7 +4,6 @@ This GlobalAction custom node builds upon the existing data export node that com
 
 These new feautures include the following:
  - Change the delimiter - **CSV Only**
- - Change the table name - **SQL Server Only**
  - Specify which fields should be exported
  - Specify the order in which the exported columns should appear
  - Modify column names
