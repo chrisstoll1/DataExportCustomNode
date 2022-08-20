@@ -39,7 +39,7 @@
 			<!-- Table Name -->
 			<div class="row">
 				<div class="col-md-12 form-group tablename-wrapper">
-					<label class="control-label">Table Name</label>
+					<label class="control-label">Table Name</label><req> *</req>
 					<input id="tableName" type="text" class="form-control" setting="TableName" setting-type="string" setting-hidden>
 				</div>
 			</div>
@@ -47,8 +47,8 @@
 			<!-- Delimiter -->
 			<div class="row">
 				<div class="col-md-12 form-group delimiter-wrapper">
-					<label class="control-label">Delimiter</label>
-					<input id="delimiter" type="text" class="form-control" value="," setting="Delimiter" setting-type="string" setting-hidden>
+					<label class="control-label" data-toggle="tooltip" data-placement="top" title="Delimiter will default to a comma if left empty">Delimiter</label>
+					<input id="delimiter" type="text" class="form-control" setting="Delimiter" setting-type="string" setting-hidden>
 				</div>
 			</div>
 

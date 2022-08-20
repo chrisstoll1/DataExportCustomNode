@@ -226,6 +226,7 @@ namespace DataExportCustomNode
                                     {
                                         SqlCommand addTableColumn = new SqlCommand($"ALTER TABLE {TableName} ADD [{exportRow.Values[i].ColumnName}] {datatype}", connection);
                                         addTableColumn.ExecuteNonQuery();
+                                        existingColumns.Add(exportRow.Values[i].ColumnName);
                                     }
                                 }
 
