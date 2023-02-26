@@ -119,11 +119,13 @@ namespace DataExportCustomNode
                 switch (ExportType)
                 {
                     case "CSV":
-                        ExportToCSV(ExportPath, Export, Delimiter, ColumnName, AppendToExisting, IncludeColumnHeaders);
+                        CSVExporter csvExporter = new CSVExporter(ExportPath, ColumnName, Export, Delimiter, AppendToExisting, IncludeColumnHeaders);
+                        csvExporter.Export();
                         LogHistory($"Data Exported to CSV: {ExportPath}");
                         break;
                     case "SQL":
-                        ExportToSQL(ExportPath, Export, TableName);
+                        SQLExporter sqlExporter = new SQLExporter(ExportPath, TableName, Export);
+                        sqlExporter.Export();
                         LogHistory($"Data Exported to SQL: {TableName}");
                         break;
                 }
@@ -176,143 +178,5 @@ namespace DataExportCustomNode
                 return false;
             }
         }
-        internal void ExportToSQL(string ConnectionString, List<ExportRow> Export, string TableName)
-        {
-            using (SqlConnection connection = new SqlConnection(ConnectionString))
-            {
-                connection.Open();
-
-                using (SqlTransaction transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        bool tableExists;
-                        bool tableCreated = false;
-                        SqlCommand checkIfTableExists = new SqlCommand($"SELECT CASE WHEN EXISTS((SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{TableName}')) THEN 1 ELSE 0 END", connection, transaction);
-                        tableExists = (int)checkIfTableExists.ExecuteScalar() == 1;
-
-                        List<string> existingColumns = new List<string>();
-                        if (tableExists)
-                        {
-                            SqlCommand getTableColumns = new SqlCommand($"SELECT C.NAME FROM sys.columns C INNER JOIN sys.tables T on T.object_id = C.object_id AND T.NAME = '{TableName}' AND T.TYPE = 'U'", connection, transaction);
-                            using (var reader = getTableColumns.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    existingColumns.Add(reader.GetString(0));
-                                }
-                            }
-                        }
-
-                        foreach (var exportRow in Export)
-                        {
-
-                            string newColumns = "";
-                            string columns = "";
-                            string values = "";
-                            for (int i = 0; i < exportRow.Values.Count; i++) //Generate Columns/Values
-                            {
-                                //LogHistory($"{exportRow.Values[i].Value}");
-                                int type = exportRow.Values[i].Type;
-                                string value = exportRow.Values[i].Value;
-
-                                string datatype = "";
-                                switch (type)
-                                {
-                                    case 1:
-                                        datatype = "VARCHAR(MAX)";
-                                        break;
-                                    case 2:
-                                        datatype = "INT";
-                                        break;
-                                    case 3:
-                                        datatype = "DATE";
-                                        break;
-                                    case 4:
-                                        datatype = "FLOAT";
-                                        break;
-                                }
-                                string delimiter = (i != 0) ? "," : string.Empty;
-                                newColumns = $"{newColumns}{delimiter}[{exportRow.Values[i].ColumnName}] {datatype}";
-                                columns = $"{columns}{delimiter}[{exportRow.Values[i].ColumnName}]";
-                                values = $"{values}{delimiter}'{value}'";
-
-                                if (tableExists && !existingColumns.Contains(exportRow.Values[i].ColumnName) && !tableCreated) //create new column if it does not exist
-                                {
-                                    SqlCommand addTableColumn = new SqlCommand($"ALTER TABLE {TableName} ADD [{exportRow.Values[i].ColumnName}] {datatype}", connection, transaction);
-                                    addTableColumn.ExecuteNonQuery();
-                                    existingColumns.Add(exportRow.Values[i].ColumnName);
-                                }
-                            }
-
-                            if (!tableExists && !tableCreated)
-                            {
-                                SqlCommand createTableCommand = new SqlCommand($"CREATE TABLE [{TableName}] ({newColumns})", connection, transaction);
-                                createTableCommand.ExecuteNonQuery();
-                                tableCreated = true;
-                            }
-
-                            SqlCommand updateTableCommand = new SqlCommand($"INSERT INTO [{TableName}] ({columns}) VALUES ({values})", connection, transaction);
-                            updateTableCommand.ExecuteNonQuery();
-                        }
-
-                        transaction.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        throw ex;
-                    }
-                }
-            }
-        }
-        internal void ExportToCSV(string ExportPath, List<ExportRow> Export, string Delimiter, List<string> ColumnName, bool AppendToExisting, bool IncludeColumnHeaders)
-        {
-            bool fileCreated = false;
-            foreach (var exportRow in Export)
-            {
-                string line = "";
-                string headers = "";
-                for (int i = 0; i < exportRow.Values.Count; i++) //Generate Header/Line
-                {
-                    string value = $"{exportRow.Values[i].Value}";
-                    if (value.Contains(Delimiter))
-                    {
-                        value = $"\"{value}\"";
-                    }
-                    string delimiter = (i != 0) ? (Delimiter == string.Empty) ? "," : Delimiter : string.Empty;
-                    line = $"{line}{delimiter}{value}";
-                    headers = $"{headers}{delimiter}{ColumnName[i]}";
-                }
-
-                bool exists = System.IO.File.Exists(ExportPath);
-                if (exists && !AppendToExisting && !fileCreated)
-                {
-                    int lastIndex = ExportPath.LastIndexOf('.');
-                    var name = ExportPath.Substring(0, lastIndex);
-                    var ext = ExportPath.Substring(lastIndex + 1);
-                    int fileCount = 0;
-                    do
-                    {
-                        fileCount++;
-                    }
-                    while (System.IO.File.Exists($"{name}_{fileCount}.{ext}"));
-                    ExportPath = $"{name}_{fileCount}.{ext}";
-                    exists = false;
-                }
-
-                fileCreated = true;
-
-                using (StreamWriter sw = System.IO.File.AppendText(ExportPath)) //Write to File
-                {
-                    if (!exists && IncludeColumnHeaders)
-                    {
-                        sw.WriteLine(headers);
-                    }
-                    sw.WriteLine(line);
-                }
-            }
-        }
     }
-
 }

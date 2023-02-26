@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSVExporter.cs" />
     <Compile Include="Helpers\Doc.cs" />
     <Compile Include="Helpers\ExportRow.cs" />
     <Compile Include="Helpers\ExportValue.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestRequests.cs" />
+    <Compile Include="SQLExporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
