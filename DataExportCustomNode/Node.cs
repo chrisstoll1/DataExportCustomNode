@@ -28,6 +28,7 @@ namespace DataExportCustomNode
             List<ExportRow> Export = new List<ExportRow>();
             Result GSDocument = null;
             string UniqueID = Guid.NewGuid().ToString();
+            int RowCounter = 0;
 
             try
             {
@@ -45,6 +46,7 @@ namespace DataExportCustomNode
                 {
                     ExportRow exportRow = new ExportRow();
                     exportRow.Values = new List<ExportValue>();
+                    RowCounter++;
                     for (int i = 0; i < Fields.Count; i++)
                     {
                         ExportValue exportValue = new ExportValue();
@@ -62,6 +64,10 @@ namespace DataExportCustomNode
                             case "IID":
                                 exportValue.Value = UniqueID;
                                 exportValue.Type = 1;
+                                break;
+                            case "-RowCounter-":
+                                exportValue.Value = RowCounter.ToString();
+                                exportValue.Type = 2;
                                 break;
                             default:
                                 try //Try to use a property 
