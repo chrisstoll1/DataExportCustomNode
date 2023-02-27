@@ -81,7 +81,7 @@ $("body").on("click", "#optionDropDown", function () {
         $(this).closest("div").find("ul").children().last().find("a").attr('id', 'removeRow');
     }
     var fieldSelectValue = $(this).closest("tr").find("#fieldSelect").val();
-    if (fieldSelectValue == '' || fieldSelectValue == 'DocID' || fieldSelectValue == 'ArchiveID' || fieldSelectValue == 'IID') {
+    if (fieldSelectValue == '' || fieldSelectValue == 'DocID' || fieldSelectValue == 'ArchiveID' || fieldSelectValue == 'IID' || fieldSelectValue == '-RowCounter-') {
         $(this).closest("div").find("ul").children().first().attr('class', 'disabled');
         $(this).closest("div").find("ul").children().first().find("a").attr('id', '');
         $(this).closest("div").find("ul").children().first().find("a").attr('data-target', '');
